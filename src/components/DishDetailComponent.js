@@ -8,7 +8,7 @@ import {
     BreadcrumbItem,
     Breadcrumb,
     Button,
-    Modal,ModalBody,ModalHeader, Row, Input,Col,Label
+    Modal,ModalBody,ModalHeader, Row,Col,Label
   } from 'reactstrap';
 import {Control,LocalForm,Errors} from 'react-redux-form';
 import {Link} from 'react-router-dom';
@@ -40,7 +40,8 @@ import {Link} from 'react-router-dom';
     }
 
     handleComment(values){
-        alert('Current State is: ' + JSON.stringify(values));
+       this.toggleModal();
+       this.props.addComment(this.props.dishId,values.rating,values.name,values.comment);
     }
 
 
@@ -113,7 +114,7 @@ import {Link} from 'react-router-dom';
   }
   
 
-  function RenderDish(dish){
+  const RenderDish = ({dish})=>{
     if (dish != null) {
         return(
         <div className="col-12 col-md-5">
@@ -131,7 +132,7 @@ import {Link} from 'react-router-dom';
     }
   }
 
-  function RenderComments(comments){
+  const RenderComments = ({comments,addComment,dishId})=>{
     if(comments.length>0){
         return<div className="col-12 col-md-5">
             <header><h4>Comments</h4></header>
@@ -143,7 +144,7 @@ import {Link} from 'react-router-dom';
                 </>
             })}
             </ul>
-            <CommentForm/>
+            <CommentForm dishId={dishId} addComment={addComment}/>
         </div>
     }
     else{
@@ -155,7 +156,7 @@ import {Link} from 'react-router-dom';
   }
  
   
-const DishDetail =({dish,comments})=>{
+const DishDetail =({dish,comments,addComment})=>{
     return(
         <div className="container">
             <div className='row'>
@@ -169,8 +170,8 @@ const DishDetail =({dish,comments})=>{
                 </div> 
             </div>
             <div className="row">
-            {RenderDish(dish)}
-            {RenderComments(comments)}
+            <RenderDish dish={dish} />
+            <RenderComments comments={comments} dishId={dish.id} addComment={addComment}/>
             </div>
         </div>
     )
