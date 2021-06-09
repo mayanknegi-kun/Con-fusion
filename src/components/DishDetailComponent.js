@@ -12,6 +12,8 @@ import {
   } from 'reactstrap';
 import {Control,LocalForm,Errors} from 'react-redux-form';
 import {Link} from 'react-router-dom';
+import {Loading} from "./LoadingComponent"
+import {baseUrl} from "../shared/baseUrl"
 
   //validation for name
   const required =(val)=>val && val.length;
@@ -41,7 +43,7 @@ import {Link} from 'react-router-dom';
 
     handleComment(values){
        this.toggleModal();
-       this.props.addComment(this.props.dishId,values.rating,values.name,values.comment);
+       this.props.postComment(this.props.dishId,values.rating,values.name,values.comment);
     }
 
 
@@ -114,12 +116,30 @@ import {Link} from 'react-router-dom';
   }
   
 
-  const RenderDish = ({dish})=>{
-    if (dish != null) {
+  const RenderDish = ({dish,isLoading,errMess})=>{
+      if(isLoading){
+          return(
+              <div className="container">
+                  <div className="row">
+                      <Loading/>
+                  </div>
+              </div>
+          )
+      }
+      else if(errMess){
+        return(
+            <div className="container">
+                <div className="row">
+                    <h4>{errMess}</h4>
+                </div>
+            </div>
+        )
+      }
+    else if (dish != null) {
         return(
         <div className="col-12 col-md-5">
         <Card className="mb-3">
-            <CardImg top width="100%" src={dish.image} alt={dish.name} />
+            <CardImg top width="100%" src={baseUrl+dish.image} alt={dish.name} />
             <CardBody>
             <CardTitle><strong>{dish.name}</strong></CardTitle>
             <CardText>{dish.description}</CardText>
@@ -132,7 +152,7 @@ import {Link} from 'react-router-dom';
     }
   }
 
-  const RenderComments = ({comments,addComment,dishId})=>{
+  const RenderComments = ({comments,postComment,dishId})=>{
     if(comments.length>0){
         return<div className="col-12 col-md-5">
             <header><h4>Comments</h4></header>
@@ -144,7 +164,7 @@ import {Link} from 'react-router-dom';
                 </>
             })}
             </ul>
-            <CommentForm dishId={dishId} addComment={addComment}/>
+            <CommentForm dishId={dishId} postComment={postComment}/>
         </div>
     }
     else{
@@ -156,12 +176,13 @@ import {Link} from 'react-router-dom';
   }
  
   
-const DishDetail =({dish,comments,addComment})=>{
+const DishDetail =({dish,comments,postComment,isLoading,errMess})=>{
     return(
         <div className="container">
             <div className='row'>
                 <Breadcrumb>
                     <BreadcrumbItem><Link to='/menu'>Menu</Link></BreadcrumbItem>
+                    {/* breaks because of delay in getting dish value coz of setTimeout */}
                     <BreadcrumbItem active>{dish.name}</BreadcrumbItem>
                 </Breadcrumb>
                <div className="col-12">
@@ -170,8 +191,8 @@ const DishDetail =({dish,comments,addComment})=>{
                 </div> 
             </div>
             <div className="row">
-            <RenderDish dish={dish} />
-            <RenderComments comments={comments} dishId={dish.id} addComment={addComment}/>
+            <RenderDish dish={dish} isLoading={isLoading} errMess={errMess} />
+            <RenderComments comments={comments} dishId={dish.id} postComment={postComment}/>
             </div>
         </div>
     )
